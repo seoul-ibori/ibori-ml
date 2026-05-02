@@ -1,0 +1,13 @@
+# 모델 바이너리 (용량이 크므로 제외)
+model/*.pkl
+
+# 가상환경
+.venv/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
