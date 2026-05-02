@@ -1,0 +1,12 @@
+{
+  "latest": "v1",
+  "versions": {
+    "v1": {
+      "filename": "dong_congestion_v1.pkl",
+      "trained_at": "2026-05-02 22:42:33",
+      "sklearn_version": "1.8.0",
+      "n_samples": 24612,
+      "test_accuracy": 0.9972
+    }
+  }
+}
