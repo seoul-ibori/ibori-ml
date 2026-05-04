@@ -1,0 +1,24 @@
+# 가상환경
+.venv/
+
+# 모델 바이너리 (런타임에 OCI에서 다운로드)
+model/*.pkl
+
+# 원본 데이터
+data/
+
+# Git
+.git/
+.github/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# 기타
+README.md
+preprocess/
