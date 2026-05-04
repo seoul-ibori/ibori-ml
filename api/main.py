@@ -16,16 +16,16 @@ class PredictRequest(BaseModel):
 
 
 class PredictResponse(BaseModel):
-    동: str
-    자치구: str
-    월: int
-    요일: str
-    예측_혼잡도: str
-    신뢰도: float = Field(..., description="예측 신뢰도 (%)")
-    불확실도: float = Field(..., description="엔트로피 기반 불확실도 (%)")
-    확률: dict = Field(..., description="각 혼잡도 클래스별 확률 (%)")
-    의료기관수: int
-    영업클리닉수: float
+    dong: str
+    gu: str
+    month: int
+    day_of_week: str
+    congestion_level: str = Field(..., description="여유 / 보통 / 혼잡 / 매우혼잡")
+    confidence: float = Field(..., description="예측 신뢰도 (%)")
+    uncertainty: float = Field(..., description="엔트로피 기반 불확실도 (%)")
+    probability: dict = Field(..., description="각 혼잡도 클래스별 확률 (%)")
+    clinic_count: int = Field(..., description="동 내 의료기관 수")
+    open_clinic_count: float = Field(..., description="해당 요일 영업 클리닉 수")
 
 
 @app.get("/", tags=["Health"])
@@ -41,14 +41,14 @@ def predict_congestion(req: PredictRequest):
         raise HTTPException(status_code=404, detail=result)
 
     return PredictResponse(
-        동=result["동"],
-        자치구=result["자치구"],
-        월=result["월"],
-        요일=result["요일"],
-        예측_혼잡도=result["예측_혼잡도"],
-        신뢰도=result["신뢰도(%)"],
-        불확실도=result["불확실도(%)"],
-        확률=result["확률(%)"],
-        의료기관수=result["의료기관수"],
-        영업클리닉수=result["영업클리닉수"],
+        dong=result["동"],
+        gu=result["자치구"],
+        month=result["월"],
+        day_of_week=result["요일"],
+        congestion_level=result["예측_혼잡도"],
+        confidence=result["신뢰도(%)"],
+        uncertainty=result["불확실도(%)"],
+        probability=result["확률(%)"],
+        clinic_count=result["의료기관수"],
+        open_clinic_count=result["영업클리닉수"],
     )
