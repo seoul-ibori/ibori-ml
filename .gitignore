@@ -1,6 +1,10 @@
 # 모델 바이너리 (용량이 크므로 제외)
 model/*.pkl
 
+# 전처리 원본 데이터 (무겁고 공공데이터포털에서 재다운로드 가능)
+data/origin_data/
+data/hospital_location_1.csv
+
 # 가상환경
 .venv/
 

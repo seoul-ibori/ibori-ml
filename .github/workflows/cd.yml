@@ -1,0 +1,78 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            mkdir -p $HOME/ibori-ml
+            cd $HOME/ibori-ml
+
+            cat <<EOF > .env
+            OCI_ACCESS_KEY=${{ secrets.OCI_ACCESS_KEY }}
+            OCI_SECRET_KEY=${{ secrets.OCI_SECRET_KEY }}
+            OCI_NAMESPACE=${{ secrets.OCI_NAMESPACE }}
+            OCI_REGION=${{ secrets.OCI_REGION }}
+            EOF
+
+            cat <<EOF > docker-compose.yml
+            services:
+              ibori-ml:
+                image: ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPO }}:latest
+                container_name: ibori-ml-container
+                restart: always
+                ports:
+                  - "8000:8000"
+                env_file:
+                  - .env
+                networks:
+                  - ibori-network
+
+            networks:
+              ibori-network:
+                external: true
+            EOF
+
+            docker compose pull
+            docker compose up -d
+            docker image prune -f
