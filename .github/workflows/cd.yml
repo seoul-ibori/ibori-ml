@@ -66,10 +66,10 @@ jobs:
                 env_file:
                   - .env
                 networks:
-                  - ibori-network
+                  - ibori-be_ibori-network
 
             networks:
-              ibori-network:
+              ibori-be_ibori-network:
                 external: true
             EOF
 
